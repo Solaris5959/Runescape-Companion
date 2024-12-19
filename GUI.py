@@ -3,7 +3,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 import threading
 from NemiForest import NemiForest
-#from TravellingMerchant import TravellingMerchant  # Assuming this function exists
+from TravellingMerchant import TravellingMerchant
 
 
 class Window(Tk):
@@ -105,7 +105,7 @@ class Window(Tk):
         """Run the TravellingMerchant function and display the image."""
         def task():
             try:
-                #TravellingMerchant()  # Run the function (assumes it saves the image in data/merchant_map.png)
+                TravellingMerchant()  # Run the function (assumes it saves the image in data/merchant_stock.png)
                 self.refresh_image()
             except Exception as e:
                 self.image_label.config(text=f"Error: {e}")
@@ -116,7 +116,7 @@ class Window(Tk):
         """Reload the image based on the selected option."""
         image_paths = {
             "NemiForest": "data/nemi_map.png",
-            "TravellingMerchant": "data/merchant_map.png"
+            "TravellingMerchant": "data/merchant_stock.png"
         }
         selected_path = image_paths.get(self.selected_image.get(), "")
 
