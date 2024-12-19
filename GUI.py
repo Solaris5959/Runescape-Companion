@@ -32,21 +32,7 @@ class Window(Tk):
         self.exit_button = Button(self.toolbar, text="Exit", command=self.destroy)
         self.exit_button.pack(side="right", padx=5, pady=10)
 
-        # Checklist frame
-        self.checklist_frame = Frame(self, bg="#343e57", width=250)
-        self.checklist_frame.pack(side="right", fill="y")
-        self.checklist_frame.pack_propagate(False)  # Prevent the frame from resizing to fit its contents
-
-        # Checklist title
-        self.checklist_title = Label(self.checklist_frame, text="Dailies", bg="#343e57", font=("Arial", 20, "bold"))
-        self.checklist_title.pack(pady=10)
-
-        # Checklist items
-        self.checklist_vars = [IntVar() for _ in range(3)]
-        self.checklist_items = ["Nemi Forest", "Travelling Merchant", "Daily Challenges"]
-        for i, item in enumerate(self.checklist_items):
-            check = Checkbutton(self.checklist_frame, text=item, variable=self.checklist_vars[i], bg="#465375", width=25, anchor="w")
-            check.pack(anchor="w", padx=10, pady=5)
+        self.init_checklist()
 
         # Image frame
         self.image_frame = Frame(self, bg="#192134")
@@ -79,6 +65,30 @@ class Window(Tk):
         self.image_label.pack(expand=True)
 
         self.refresh_image()  # Load the initial image
+
+    def init_checklist(self):
+        checklist = [
+            "Nemi Forest", "Travelling Merchant", "Daily Challenges", "Edgeville Slayer Shop",
+            "Burthorpe Slayer Shop", "Vis Wax", "Rune Shops", "Reaper Task", "PoF", "Ports",
+            "Ooglog Mining/Meat", "Prifddinas Mining", "Um Diary Supplies", "Bucket of Slime",
+            "Soul Obelisk"
+        ]
+
+        # Checklist frame
+        self.checklist_frame = Frame(self, bg="#343e57", width=250)
+        self.checklist_frame.pack(side="right", fill="y")
+        self.checklist_frame.pack_propagate(False)  # Prevent the frame from resizing to fit its contents
+
+        # Checklist title
+        self.checklist_title = Label(self.checklist_frame, text="Dailies", bg="#343e57", font=("Arial", 20, "bold"))
+        self.checklist_title.pack(pady=10)
+
+        # Checklist items
+        self.checklist_vars = [IntVar() for _ in range(len(checklist))]
+        self.checklist_items = checklist
+        for i, item in enumerate(self.checklist_items):
+            check = Checkbutton(self.checklist_frame, text=item, variable=self.checklist_vars[i], bg="#465375", width=25, anchor="w")
+            check.pack(anchor="w", padx=10, pady=5)
 
     def run_nemi_forest(self):
         """Run the NemiForest function and display the image."""
