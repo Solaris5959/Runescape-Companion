@@ -12,7 +12,7 @@ class Window(Tk):
         # Configure window
         self.title("RS3Helper")
         self.geometry("1000x600")  # Increased resolution
-        self.configure(bg="#192134")
+        self.configure(bg="#091021")
 
         # Toolbar frame
         self.toolbar = Frame(self, bg="#091021", height=50)
@@ -29,20 +29,19 @@ class Window(Tk):
         self.exit_button.pack(side="right", padx=5, pady=10)
 
         # Checklist frame
-        self.checklist_frame = Frame(self, bg="#091021", width=300)
+        self.checklist_frame = Frame(self, bg="#343e57", width=250)
         self.checklist_frame.pack(side="right", fill="y")
         self.checklist_frame.pack_propagate(False)  # Prevent the frame from resizing to fit its contents
 
-
         # Checklist title
-        self.checklist_title = Label(self.checklist_frame, text="Dailies", bg="#091021", font=("Arial", 14, "bold"))
+        self.checklist_title = Label(self.checklist_frame, text="Dailies", bg="#343e57", font=("Arial", 20, "bold"))
         self.checklist_title.pack(pady=10)
 
         # Checklist items
         self.checklist_vars = [IntVar() for _ in range(3)]
         self.checklist_items = ["Nemi Forest", "Travelling Merchant", "Daily Challenges"]
         for i, item in enumerate(self.checklist_items):
-            check = Checkbutton(self.checklist_frame, text=item, variable=self.checklist_vars[i], bg="#343e57")
+            check = Checkbutton(self.checklist_frame, text=item, variable=self.checklist_vars[i], bg="#465375", width=25, anchor="w")
             check.pack(anchor="w", padx=10, pady=5)
 
         # Image frame
@@ -56,8 +55,20 @@ class Window(Tk):
         self.image_menu.pack(side="top", anchor="nw", padx=5, pady=5)
 
         # Refresh button in the viewport
-        self.refresh_button = Button(self.image_frame, text="Refresh Image", command=self.refresh_image)
+        refresh_icon = PhotoImage(file="data/refresh_icon.png")
+        self.refresh_button = Button(
+            self.image_frame,
+            image=refresh_icon,
+            command=self.refresh_image,
+            bg="#192134",  # Ensure this matches the frame background
+            activebackground="#192134",  # Ensure hover background matches as well
+            relief="flat",  # Remove the 3D border
+            borderwidth=0,  # Remove any border
+            highlightthickness=0  # Remove focus outline
+        )
+        self.refresh_button.image = refresh_icon  # Keep a reference to prevent garbage collection
         self.refresh_button.pack(side="top", anchor="ne", padx=5, pady=5)
+
 
         # Placeholder for the image
         self.image_label = Label(self.image_frame, text="Image will appear here", bg="#192134")
