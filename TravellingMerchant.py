@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 
-def TravellingMerchant():
+def TravellingMerchantScript():
     # Initialize Safari WebDriver
     driver = webdriver.Safari()
 
