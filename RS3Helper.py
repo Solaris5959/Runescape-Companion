@@ -1,6 +1,6 @@
 import atexit
 import os
-from GUI import Window
+from GUI import RS3Helper
 
 # Function to delete the images when the program exits
 def delete_images():
@@ -16,5 +16,4 @@ atexit.register(delete_images)
 
 # Start the event loop.
 if __name__ == "__main__":
-    window = Window()
-    window.mainloop()
+    RS3Helper()

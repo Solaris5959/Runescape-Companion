@@ -2,7 +2,7 @@ from config import KEY, CLIENT, USER_AGENT
 from datetime import datetime, timezone
 import praw, requests, re
 
-def NemiForest():
+def NemiForestScript():
     # ------------------- Initialize Requests -------------------
     reddit = praw.Reddit(
         client_id=CLIENT,
@@ -40,6 +40,8 @@ def NemiForest():
             if response.status_code == 200:
                 with open("data/nemi_map.png", "wb") as file:
                     file.write(response.content)
+
+            return datetime.fromtimestamp(daily_nemi_post.created).strftime("%Y-%m-%d %H:%M:%S")
         else:
             raise FileNotFoundError("Critical Error: Image not found in the post.")
     else:
