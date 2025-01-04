@@ -1,8 +1,10 @@
+import os
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
-from NemiForest import NemiForestScript
-from TravellingMerchant import TravellingMerchantScript
+from NemiForest import nemiForestScript
+from TravellingMerchant import travellingMerchantScript
+from PenguinWebview import penguin_webview
 
 class RS3Helper(tk.Tk):
     def __init__(self):
@@ -38,7 +40,7 @@ class MainViewport(ttk.Frame):
         super().__init__(parent)
 
         # Set the size and position of the main viewport
-        self.place(x=0, y=0, relwidth=0.625, relheight=0.9)
+        self.place(x=0, rely=0.1, relwidth=0.625, relheight=0.9)
 
         # Create the frames to be toggled
         self.nemi_forest = NemiForest(self)
@@ -58,6 +60,7 @@ class MainViewport(ttk.Frame):
         """Show a specific frame."""
         self.hide_all_frames()
         frame.place(x=0, y=0, relwidth=1, relheight=1)
+        frame.run_script()
 
 class ChecklistViewport(ttk.Frame):
     def __init__(self, parent):
@@ -84,29 +87,38 @@ class ChecklistViewport(ttk.Frame):
         self.hide_all_frames()
         frame.place(x=0, y=0, relwidth=1, relheight=1)
 
-
 class NemiForest(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        ttk.Label(self, text="Nemi Forest Map", font=("Arial", 16, "bold")).pack(pady=10)
+
         try:
-            date = NemiForestScript()
-            self.map_image = load_image("data/nemi_map.png", (572, 433))
+            date = nemiForestScript()
+            print(date)
+            self.map_image = load_image("data/nemi_map.png", 1.0)
             ttk.Label(self, image=self.map_image, anchor="center").place(x=0, rely=0.05, relwidth=1, relheight=0.9)
             ttk.Label(self, text=f"Last updated: {date}", font=("Arial", 20, "bold")).place(relx=0.1, rely=0.85, relwidth=0.9, relheight=0.1)
         except Exception as e:
-            ttk.Label(self, text=f"Error: {e}", justify="center").place(x=0, y=0, relwidth=1, relheight=1)
+            ttk.Label(self, text=f"Error: {e}", justify="right", anchor="center").place(x=0, rely=0.1, relwidth=1, relheight=0.9)
+
+    def run_script(self):
+        pass
 
 class TravellingMerchant(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        ttk.Label(self, text="Travelling Merchant's Shop", font=("Arial", 16, "bold")).pack(pady=10)
+
+    def run_script(self):
         try:
-            TravellingMerchantScript()
-            self.stock_image = load_image("data/merchant_stock.png", (572, 433))
-            ttk.Label(self, image=self.stock_image, anchor="center").place(x=0, rely=0.05, relwidth=1, relheight=0.9)
+            if not os.path.exists("data/merchant_stock.png"):
+                travellingMerchantScript()
+            self.stock_image = load_image("data/merchant_stock.png", 1.0)
+            ttk.Label(self, image=self.stock_image, anchor="n").place(x=0, rely=0.1, relwidth=1, relheight=0.7)
         except Exception as e:
-            ttk.Label(self, text=f"Error: {e}").place(x=0, y=0, relwidth=1, relheight=1)
+            ttk.Label(self, text=f"Error: {e}", justify="center").place(x=0, y=0, relwidth=1, relheight=1)
 
 class ShopRuns(ttk.Frame):
     def __init__(self, parent):
@@ -114,21 +126,64 @@ class ShopRuns(ttk.Frame):
 
         ttk.Label(self, text="Recommended Shop Runs", font=("Arial", 16, "bold")).pack(pady=10)
 
-        # Add some realistic RS3 shop information
+        # First table: Shop information
         shop_data = [
             ("Shop Name", "Location", "Recommended Items"),
-            ("Lowe's Archery Emporium", "Varrock", "Bronze arrows, Shortbow"),
-            ("Zaff's Superior Staffs!", "Varrock", "Battle staffs"),
-            ("Aubury's Rune Shop", "Varrock", "Air runes, Earth runes"),
-            ("Wydin's Food Store", "Port Sarim", "Chocolate bars, Pot of flour"),
-            ("Herquin's Gems", "Falador", "Uncut gems"),
+            ("Morvan's Slayer Equipment", "Prifddinas", "Enchanted gem pack, Insulated boots"),
+            ("Turael/Spiria's Slayer Equipment", "Burthorpe", "Enchanted gem pack, Insulated boots"),
+            ("Sophanem Slayer Supplies", "Sophanem", "Feather of Ma'at"),
+            ("Fresh Meat", "Oo'glog", "Raw rabbit pack, Raw beef pack, Raw bird meat pack"),
         ]
 
-        # Create a table-like display
-        for shop in shop_data:
-            ttk.Label(self, text=f"{shop[0]:<20} | {shop[1]:<15} | {shop[2]}").pack(anchor="w", padx=10)
+        columns = ("shop_name", "location", "recommended_items")
+        tree = ttk.Treeview(self, columns=columns, show="headings")
+        tree.heading("shop_name", text="Shop Name")
+        tree.heading("location", text="Location")
+        tree.heading("recommended_items", text="Recommended Items")
+        tree.column("shop_name", width=210)
+        tree.column("location", width=110)
+        tree.column("recommended_items", width=360)
 
-        ttk.Label(self, text="Tip: Focus on shops with limited stock to maximize profit margins!", font=("Arial", 12, "italic")).pack(pady=10)
+        for shop in shop_data:
+            tree.insert("", "end", values=shop)
+
+        tree.pack(fill="x", padx=10, pady=10)
+
+        # Second table: Steps with checkboxes
+        ttk.Label(self, text="Basic Daily Run Steps", font=("Arial", 14, "bold")).pack(pady=10)
+
+        steps_frame = ttk.Frame(self)
+        steps_frame.pack(fill="x", padx=10)
+
+        # Define daily run steps
+        daily_steps = [
+            "Start in Prifddinas, mine the Crystal Sandstone in Ithell",
+            "Visit Morvan's Slayer Equipment in Iowerth",
+            "Teleport to Burthorpem visit Turael/Spiria's Slayer Equipment",
+            "Teleport to Oo'glog, mine the Red Sandstone",
+            "Buy raw meat packs from Chargurr across from the bank",
+            "Teleport to Menaphos, cross the bridge and visit Sophanem Slayer Supplies",
+            "Use the Wicked Hood teleport to the Runecrafting Guild, do daily Vis Wax"
+        ]
+
+        self.step_vars = []  # To store the BooleanVar for each step
+
+        # Create a table-like layout for steps with checkboxes
+        for step in daily_steps:
+            var = tk.BooleanVar()
+            checkbox = ttk.Checkbutton(steps_frame, text=step, variable=var)
+            checkbox.pack(anchor="w", pady=2)
+            self.step_vars.append(var)
+
+        # Optionally, add a button to mark all steps as completed
+        ttk.Button(self, text="Mark All as Completed", command=self.mark_all_completed).pack(pady=10)
+
+    def mark_all_completed(self):
+        for var in self.step_vars:
+            var.set(True)
+
+    def run_script(self):
+        pass  # No script to run for ShopRuns
 
 class PenguinTracker(ttk.Frame):
     def __init__(self, parent):
@@ -136,85 +191,236 @@ class PenguinTracker(ttk.Frame):
 
         ttk.Label(self, text="Penguin Hide and Seek Tracker", font=("Arial", 16, "bold")).pack(pady=10)
 
-        # Placeholder for penguin tracking info
-        ttk.Label(self, text="This widget will display penguin locations and hints for the current week.", wraplength=500, justify="center").pack(pady=20)
-
-        ttk.Label(self, text="Penguins Spotted:", font=("Arial", 14)).pack(pady=10)
-        ttk.Label(self, text="1. Draynor Village - Near the market", font=("Arial", 12)).pack(anchor="w", padx=20)
-        ttk.Label(self, text="2. Ardougne - Hiding in the zoo", font=("Arial", 12)).pack(anchor="w", padx=20)
-        ttk.Label(self, text="3. Taverley - Near the crystal chest", font=("Arial", 12)).pack(anchor="w", padx=20)
-
-        ttk.Label(self, text="Tip: Use the Penguin Spy Device to locate penguins more efficiently!", font=("Arial", 12, "italic")).pack(pady=10)
-
+    def run_script(self):
+        try:
+            penguin_webview()
+        except Exception as e:
+            print(f"Error: {e}")
 
 class Daily(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Daily Activities", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
+        ttk.Label(self, text="Daily Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
 
-        daily_activities = [
-            "Visit Guthixian Caches for Divination experience.",
-            "Claim daily Wicked Hood runes and teleport charges.",
-            "Complete Warbands for bonus experience and supplies.",
-            "Harvest Player-Owned Farm animals.",
-            "Check and replenish Anachronia Base Camp resources.",
-            "Claim the daily reward from the Traveling Merchant (if available).",
-            "Complete the Motherlode Maw roll (if eligible).",
-            "Collect Daily Challenges rewards.",
-            "Buy Battlestaves from Zaff in Varrock.",
-            "Purchase limited stock items from shops (e.g., chocolate bars, feathers).",
-            "Collect runes from Magic shops (Aubury, Betty, etc.).",
-            "Claim daily Treasure Hunter keys.",
-        ]
+        # Create a frame to hold the scrollable content
+        container = ttk.Frame(self)
+        container.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Create a canvas and scrollbar
+        canvas = tk.Canvas(container)
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        # Configure the canvas
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        # Pack the canvas and scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # Add the activities with checkboxes
+        daily_activities = sorted(list(set([
+            "Play Wilderness Warbands",
+            "Buy Port Resources from Black Marketeer",
+            "Run Mazcab Supply run",
+            "Play Fish Flingers.",
+            "Mine Shooting Star.",
+            "Enter Sinkholes.",
+            "Kill 2 Evil Trees.",
+            "Participate in Big Chinchompa 2 times.",
+            "Play Guthixian Cache 2 times.",
+            "Hand in 1k rune dust.",
+            "Train at Serenity posts.",
+            "Harvest Crystal tree blossoms.",
+            "Collect from Divine locations.",
+            "Use Jack of Trades aura.",
+            "Assist players using Assist System.",
+            "Complete Soul Reaper tasks.",
+            "Slay or prune Jade vine.",
+            "Kill Bork in Chaos Tunnels.",
+            "Kill Phoenix in lair.",
+            "Mine red sandstone.",
+            "Mine crystal-flecked sandstone.",
+            "Collect Gorajo card from Gorajo dungeon.",
+            "Collect 8,000 Tokkul from TzHaar-Hur-Zuh.",
+            "Train using Book of Char.",
+            "Teleport 5 times to slime pit.",
+            "Buy items from shops.",
+            "Collect flax from Geoffrey.",
+            "Get sand from Bert in Yanille.",
+            "Collect pure essence from Wizard Cromperty.",
+            "Daily bag of lost items from Rug Merchants.",
+            "Use Explorer’s ring to cast alchemy.",
+            "Turn soda ash into molten glass.",
+            "Operate Rune Goldberg Machine.",
+            "Utilize Wicked hood.",
+            "Convert bones into bonemeal and slime.",
+            "Collect food hamper from Lumbridge Castle.",
+            "Collect item from Motherlode Maw.",
+            "Exchange crystal shards with Wythien.",
+            "Collect soft clay from artisan’s bandana.",
+            "Collect spirit shards from shaman’s headdress.",
+            "Collect coal from blacksmith’s helmet.",
+            "Collect vials of water from botanist’s mask.",
+            "Collect nests from farmer’s hat.",
+            "Collect dragon bones from first age tiara.",
+            "Collect pie shells from sous chef’s toque.",
+            "Collect chronicle fragments from diviner’s headwear.",
+            "Collect from PoH Aquarium Decorations.",
+            "Free logs from Coeden.",
+            "Do tasks assigned by Trinks.",
+            "Do Nemi Forest activities.",
+            "Gain reputation from Soul obelisks.",
+            "Collect supplies from Rosie.",
+            "Complete Arc contracts.",
+            "Deplete resources on Uncharted Isles.",
+            "Heart of Gielinor bounty.",
+            "Use Treasure Hunter keys.",
+            "Collect free Necromancy supplies from Lupe."
+        ])))
+
 
         for activity in daily_activities:
             var = tk.BooleanVar()
-            tk.Checkbutton(self, text=activity, variable=var, font=("Arial", 12), anchor="w", justify="left").pack(fill="x", padx=10, pady=2)
+            tk.Checkbutton(
+                scrollable_frame,
+                text=activity,
+                variable=var,
+                font=("Arial", 12),
+                anchor="w",
+                justify="left"
+            ).pack(fill="x", padx=10, pady=2)
 
+
+    def run_script(self):
+        pass  # No script to run for Daily
 
 class Weekly(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Weekly Activities", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
+        ttk.Label(self, text="Weekly Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
 
-        weekly_activities = [
-            "Complete the Troll Invasion D&D for bonus experience.",
-            "Participate in Penguin Hide and Seek for points.",
-            "Claim rewards from the Circus for performance skill experience.",
-            "Collect resources from Managing Miscellania.",
-            "Complete the Tears of Guthix minigame for experience in your lowest skill.",
-            "Do the Big Chinchompa D&D for Hunter experience.",
-            "Fight the Skeletal Horror for Slayer experience.",
-            "Complete the Agoroth boss fight for Slayer experience.",
-            "Check Anachronia's Totem of Treasure for a weekly roll.",
-            "Harvest the Giant Oyster for clue scroll rewards.",
+        # Create a frame to hold the scrollable content
+        container = ttk.Frame(self)
+        container.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Create a canvas and scrollbar
+        canvas = tk.Canvas(container)
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        # Configure the canvas
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        # Pack the canvas and scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # Add the activities with checkboxes
+        weekly_activities = sorted(list(set([
+            "Activate Anachronia Totems for Divination XP and totem benefits.",
+            "Cap at the Clan Citadel for XP and resources.",
+            "Claim raw bacon or Pig Familiar Pouches from Eli Bacon.",
+            "Claim the Weekly Key from Shooting Star, Evil Tree, or Farming.",
+            "Clean out the Water Filtration System in Het's Oasis.",
+            "Collect from Aquarium Decorations for clue scrolls and planks.",
+            "Collect resources from Managing Miscellania & cap Favour.",
             "Complete Player-Owned Slayer Dungeon tasks.",
-        ]
+            "Complete the Agoroth boss fight for Bonus experience.",
+            "Complete the Circus D&D for performance experience.",
+            "Complete the Familiarisation D&D for Summoning Charm boosts.",
+            "Complete the Herby Werby D&D for Herblore experience.",
+            "Complete the Tears of Guthix D&D for XP in your lowest skill.",
+            "Complete the Wisps of the Grove D&D for Farming & Hunter XP.",
+            "Follow up on A Barmaid's Tip at Player-Owned Ports (Thursday).",
+            "Help Meg for experience lamps and coins.",
+            "Kill Skeletal horror for Slayer and Prayer experience.",
+            "Participate in Penguin Hide and Seek for points.",
+            "Play Balthazar Beauregard's Circus for performance XP.",
+            "Play Rush of Blood for Slayer rewards.",
+            "Play Shattered Worlds challenge mode for shattered anima.",
+            "Purchase stock from Thalmund (Wednesday Only).",
+            "Refight defeated champions for Slayer XP and Constitution XP.",
+            "Replay Broken Home for a large or huge prismatic lamp.",
+            "Replay Dimension of Disaster for XP lamps and silver pennies.",
+            "Replay Memory of Nomad for Constitution and Slayer XP.",
+            "Replay Sliske's Endgame for a medium prismatic lamp."
+        ])))
 
         for activity in weekly_activities:
             var = tk.BooleanVar()
-            tk.Checkbutton(self, text=activity, variable=var, font=("Arial", 12), anchor="w", justify="left").pack(fill="x", padx=10, pady=2)
+            tk.Checkbutton(
+                scrollable_frame,
+                text=activity,
+                variable=var,
+                font=("Arial", 12),
+                anchor="w",
+                justify="left"
+            ).pack(fill="x", padx=10, pady=2)
 
+    def run_script(self):
+        pass  # No script to run for Weekly
 
 class Monthly(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Monthly Activities", font=("Arial", 16, "bold")).pack(pady=10, anchor="w")
+        ttk.Label(self, text="Monthly Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
+
+        container = ttk.Frame(self)
+        container.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Create a canvas and scrollbar
+        canvas = tk.Canvas(container)
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        # Configure the canvas
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        # Pack the canvas and scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
 
         monthly_activities = [
-            "Complete the God Statues D&D (Prayer XP).",
-            "Participate in the Troll Invasion (Combat).",
+            "Complete the God Statues D&D (Choose Prayer XP).",
+            "Participate in the Troll Invasion (Choose Combat Mode).",
             "Check the Giant Oyster for Clue Scroll rewards.",
-            "Use your Monthly D&D token (Effigy Incubator > Oyster > Troll Invasion > Statues).",
+            "Use your Monthly D&D token (Effigy Incubator > Oyster).",
+            "Complete the Effigy Incubator D&D",
             "Claim your Premier Club reward (if eligible).",
         ]
 
         for activity in monthly_activities:
             var = tk.BooleanVar()
-            tk.Checkbutton(self, text=activity, variable=var, font=("Arial", 12), anchor="w", justify="left").pack(fill="x", padx=10, pady=2)
+            tk.Checkbutton(
+                scrollable_frame,
+                text=activity,
+                variable=var,
+                font=("Arial", 12),
+                anchor="w",
+                justify="left"
+            ).pack(fill="x", padx=10, pady=2)
+
+    def run_script(self):
+        pass  # No script to run for Monthly
 
 class PageSelectFrame(ttk.Frame):
     def __init__(self, parent, nemi_forest, travelling_merchant, shop_runs, penguin_tracker, daily, weekly, monthly):
@@ -291,8 +497,9 @@ class PageSelectFrame(ttk.Frame):
         self.hide_all_checklist_frames()
         self.monthly.place(relx=0, y=0, relwidth=1, relheight=1)
 
-def load_image(path, size):
+def load_image(path, multiplier):
     """Load and resize an image."""
     image = Image.open(path)
-    image = image.resize(size)
+
+    image = image.resize(tuple(multiplier * x for x in image.size))
     return ImageTk.PhotoImage(image)

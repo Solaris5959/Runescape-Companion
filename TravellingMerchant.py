@@ -1,12 +1,17 @@
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 
-def TravellingMerchantScript():
-    # Initialize Safari WebDriver
-    driver = webdriver.Safari()
+def travellingMerchantScript():
+    # Configure Firefox options for headless mode
+    options = Options()
+    options.add_argument("--headless")
+
+    # Initialize the Firefox WebDriver with options
+    driver = webdriver.Firefox(options=options)
 
     # Set the window size to a larger resolution
     driver.set_window_size(800, 1080)
