@@ -2,7 +2,7 @@ from config import KEY, CLIENT, USER_AGENT
 from datetime import datetime, timezone
 import praw, requests, re
 
-def NemiForestScript():
+def nemiForestScript():
     # ------------------- Initialize Requests -------------------
     reddit = praw.Reddit(
         client_id=CLIENT,
