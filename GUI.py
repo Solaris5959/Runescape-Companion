@@ -1,20 +1,21 @@
 import os
-import tkinter as tk
 from tkinter import ttk
-from PIL import Image, ImageTk
+import customtkinter as ctk
+import webbrowser
+from PIL import Image
 from NemiForest import nemiForestScript
 from TravellingMerchant import travellingMerchantScript
-from PenguinWebview import penguin_webview
 
-class RS3Helper(tk.Tk):
+class RS3Helper(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("RS3Helper")
         self.geometry("1088x612")
         self.minsize(1088, 612)
 
-        style = ttk.Style()
-        style.theme_use('aqua')
+        # Set theme
+        ctk.set_appearance_mode("dark")
+        ctk.set_default_color_theme("blue")
 
         self.main_viewport = MainViewport(self)
         self.checklist_viewport = ChecklistViewport(self)
@@ -35,7 +36,7 @@ class RS3Helper(tk.Tk):
 
         self.mainloop()
 
-class MainViewport(ttk.Frame):
+class MainViewport(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -62,7 +63,7 @@ class MainViewport(ttk.Frame):
         frame.place(x=0, y=0, relwidth=1, relheight=1)
         frame.run_script()
 
-class ChecklistViewport(ttk.Frame):
+class ChecklistViewport(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -87,44 +88,44 @@ class ChecklistViewport(ttk.Frame):
         self.hide_all_frames()
         frame.place(x=0, y=0, relwidth=1, relheight=1)
 
-class NemiForest(ttk.Frame):
+class NemiForest(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Nemi Forest Map", font=("Arial", 16, "bold")).pack(pady=10)
+        ctk.CTkLabel(self, text="Nemi Forest Map", font=("Arial", 16, "bold")).pack(pady=10)
 
         try:
             date = nemiForestScript()
             print(date)
-            self.map_image = load_image("data/nemi_map.png", 1.0)
-            ttk.Label(self, image=self.map_image, anchor="center").place(x=0, rely=0.05, relwidth=1, relheight=0.9)
-            ttk.Label(self, text=f"Last updated: {date}", font=("Arial", 20, "bold")).place(relx=0.1, rely=0.85, relwidth=0.9, relheight=0.1)
+            self.map_image = load_image("data/nemi_map.png", 0.55)
+            ctk.CTkLabel(self, image=self.map_image, text="", anchor="center").place(x=0, rely=0.1, relwidth=1, relheight=0.8)
+            ctk.CTkLabel(self, text=f"Last updated: {date}", font=("Arial", 20, "bold")).place(x=0, rely=0.9, relwidth=0.9, relheight=0.1)
         except Exception as e:
-            ttk.Label(self, text=f"Error: {e}", justify="right", anchor="center").place(x=0, rely=0.1, relwidth=1, relheight=0.9)
+            ctk.CTkLabel(self, text=f"Error: {e}", justify="right", anchor="center").place(x=0, rely=0.1, relwidth=1, relheight=0.9)
 
     def run_script(self):
         pass
 
-class TravellingMerchant(ttk.Frame):
+class TravellingMerchant(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Travelling Merchant's Shop", font=("Arial", 16, "bold")).pack(pady=10)
+        ctk.CTkLabel(self, text="Travelling Merchant's Shop", font=("Arial", 16, "bold")).pack(pady=10)
 
     def run_script(self):
         try:
             if not os.path.exists("data/merchant_stock.png"):
                 travellingMerchantScript()
             self.stock_image = load_image("data/merchant_stock.png", 1.0)
-            ttk.Label(self, image=self.stock_image, anchor="n").place(x=0, rely=0.1, relwidth=1, relheight=0.7)
+            ctk.CTkLabel(self, image=self.stock_image, text="", anchor="n").place(x=0, rely=0.1, relwidth=1, relheight=0.8)
         except Exception as e:
-            ttk.Label(self, text=f"Error: {e}", justify="center").place(x=0, y=0, relwidth=1, relheight=1)
+            ctk.CTkLabel(self, text=f"Error: {e}", justify="center").place(x=0, y=0, relwidth=1, relheight=1)
 
-class ShopRuns(ttk.Frame):
+class ShopRuns(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Recommended Shop Runs", font=("Arial", 16, "bold")).pack(pady=10)
+        ctk.CTkLabel(self, text="Recommended Shop Runs", font=("Arial", 16, "bold")).pack(pady=10)
 
         # First table: Shop information
         shop_data = [
@@ -136,7 +137,7 @@ class ShopRuns(ttk.Frame):
         ]
 
         columns = ("shop_name", "location", "recommended_items")
-        tree = ttk.Treeview(self, columns=columns, show="headings")
+        tree = ttk.Treeview(self, columns=columns, show="headings", height=5)
         tree.heading("shop_name", text="Shop Name")
         tree.heading("location", text="Location")
         tree.heading("recommended_items", text="Recommended Items")
@@ -150,9 +151,9 @@ class ShopRuns(ttk.Frame):
         tree.pack(fill="x", padx=10, pady=10)
 
         # Second table: Steps with checkboxes
-        ttk.Label(self, text="Basic Daily Run Steps", font=("Arial", 14, "bold")).pack(pady=10)
+        ctk.CTkLabel(self, text="Basic Daily Run Steps", font=("Arial", 14, "bold")).pack(pady=10)
 
-        steps_frame = ttk.Frame(self)
+        steps_frame = ctk.CTkFrame(self)
         steps_frame.pack(fill="x", padx=10)
 
         # Define daily run steps
@@ -170,13 +171,13 @@ class ShopRuns(ttk.Frame):
 
         # Create a table-like layout for steps with checkboxes
         for step in daily_steps:
-            var = tk.BooleanVar()
-            checkbox = ttk.Checkbutton(steps_frame, text=step, variable=var)
+            var = ctk.BooleanVar()
+            checkbox = ctk.CTkCheckBox(steps_frame, text=step, variable=var)
             checkbox.pack(anchor="w", pady=2)
             self.step_vars.append(var)
 
         # Optionally, add a button to mark all steps as completed
-        ttk.Button(self, text="Mark All as Completed", command=self.mark_all_completed).pack(pady=10)
+        ctk.CTkButton(self, text="Mark All as Completed", command=self.mark_all_completed).pack(pady=10)
 
     def mark_all_completed(self):
         for var in self.step_vars:
@@ -185,32 +186,29 @@ class ShopRuns(ttk.Frame):
     def run_script(self):
         pass  # No script to run for ShopRuns
 
-class PenguinTracker(ttk.Frame):
+class PenguinTracker(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Penguin Hide and Seek Tracker", font=("Arial", 16, "bold")).pack(pady=10)
+        ctk.CTkLabel(self, text="Penguin Hide and Seek Tracker", font=("Arial", 16, "bold")).pack(pady=10)
 
     def run_script(self):
-        try:
-            penguin_webview()
-        except Exception as e:
-            print(f"Error: {e}")
+        webbrowser.open("https://jq.world60pengs.com", new=1)
 
-class Daily(ttk.Frame):
+class Daily(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Daily Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
+        ctk.CTkLabel(self, text="Daily Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
 
         # Create a frame to hold the scrollable content
-        container = ttk.Frame(self)
+        container = ctk.CTkFrame(self)
         container.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Create a canvas and scrollbar
-        canvas = tk.Canvas(container)
-        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
-        scrollable_frame = ttk.Frame(canvas)
+        canvas = ctk.CTkCanvas(container)
+        scrollbar = ctk.CTkScrollbar(container, orientation="vertical", command=canvas.yview)
+        scrollable_frame = ctk.CTkFrame(canvas)
 
         # Configure the canvas
         scrollable_frame.bind(
@@ -287,34 +285,32 @@ class Daily(ttk.Frame):
 
 
         for activity in daily_activities:
-            var = tk.BooleanVar()
-            tk.Checkbutton(
+            var = ctk.BooleanVar()
+            ctk.CTkCheckBox(
                 scrollable_frame,
                 text=activity,
                 variable=var,
-                font=("Arial", 12),
-                anchor="w",
-                justify="left"
+                font=("Arial", 12)
             ).pack(fill="x", padx=10, pady=2)
 
 
     def run_script(self):
         pass  # No script to run for Daily
 
-class Weekly(ttk.Frame):
+class Weekly(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Weekly Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
+        ctk.CTkLabel(self, text="Weekly Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
 
         # Create a frame to hold the scrollable content
-        container = ttk.Frame(self)
+        container = ctk.CTkFrame(self)
         container.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Create a canvas and scrollbar
-        canvas = tk.Canvas(container)
-        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
-        scrollable_frame = ttk.Frame(canvas)
+        canvas = ctk.CTkCanvas(container)
+        scrollbar = ctk.CTkScrollbar(container, orientation="vertical", command=canvas.yview)
+        scrollable_frame = ctk.CTkFrame(canvas)
 
         # Configure the canvas
         scrollable_frame.bind(
@@ -360,32 +356,30 @@ class Weekly(ttk.Frame):
         ])))
 
         for activity in weekly_activities:
-            var = tk.BooleanVar()
-            tk.Checkbutton(
+            var = ctk.BooleanVar()
+            ctk.CTkCheckBox(
                 scrollable_frame,
                 text=activity,
                 variable=var,
-                font=("Arial", 12),
-                anchor="w",
-                justify="left"
+                font=("Arial", 12)
             ).pack(fill="x", padx=10, pady=2)
 
     def run_script(self):
         pass  # No script to run for Weekly
 
-class Monthly(ttk.Frame):
+class Monthly(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        ttk.Label(self, text="Monthly Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
+        ctk.CTkLabel(self, text="Monthly Activities", font=("Arial", 16, "bold")).pack(padx=10, pady=10, anchor="w")
 
-        container = ttk.Frame(self)
+        container = ctk.CTkFrame(self)
         container.pack(fill="both", expand=True, padx=10, pady=10)
 
         # Create a canvas and scrollbar
-        canvas = tk.Canvas(container)
-        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
-        scrollable_frame = ttk.Frame(canvas)
+        canvas = ctk.CTkCanvas(container)
+        scrollbar = ctk.CTkScrollbar(container, orientation="vertical", command=canvas.yview)
+        scrollable_frame = ctk.CTkFrame(canvas)
 
         # Configure the canvas
         scrollable_frame.bind(
@@ -409,20 +403,18 @@ class Monthly(ttk.Frame):
         ]
 
         for activity in monthly_activities:
-            var = tk.BooleanVar()
-            tk.Checkbutton(
+            var = ctk.BooleanVar()
+            ctk.CTkCheckBox(
                 scrollable_frame,
                 text=activity,
                 variable=var,
-                font=("Arial", 12),
-                anchor="w",
-                justify="left"
+                font=("Arial", 12)
             ).pack(fill="x", padx=10, pady=2)
 
     def run_script(self):
         pass  # No script to run for Monthly
 
-class PageSelectFrame(ttk.Frame):
+class PageSelectFrame(ctk.CTkFrame):
     def __init__(self, parent, nemi_forest, travelling_merchant, shop_runs, penguin_tracker, daily, weekly, monthly):
         super().__init__(parent)
 
@@ -436,15 +428,15 @@ class PageSelectFrame(ttk.Frame):
         self.monthly = monthly
 
         # Buttons for MainViewport
-        ttk.Button(self, text="Nemi Forest", command=lambda: nemi_forest.master.show_frame(nemi_forest)).place(relx=0, rely=0.25, relwidth=0.123, relheight=0.9)
-        ttk.Button(self, text="Travelling Merchant", command=lambda: travelling_merchant.master.show_frame(travelling_merchant)).place(relx=0.125, rely=0.25, relwidth=0.123, relheight=0.9)
-        ttk.Button(self, text="Shop Runs", command=lambda: shop_runs.master.show_frame(shop_runs)).place(relx=0.25, rely=0.25, relwidth=0.123, relheight=0.9)
-        ttk.Button(self, text="Penguins", command=lambda: penguin_tracker.master.show_frame(penguin_tracker)).place(relx=0.375, rely=0.25, relwidth=0.123, relheight=0.9)
+        ctk.CTkButton(self, text="Nemi Forest", command=lambda: nemi_forest.master.show_frame(nemi_forest)).place(relx=0, rely=0.25, relwidth=0.123, relheight=0.9)
+        ctk.CTkButton(self, text="Travelling Merchant", command=lambda: travelling_merchant.master.show_frame(travelling_merchant)).place(relx=0.125, rely=0.25, relwidth=0.123, relheight=0.9)
+        ctk.CTkButton(self, text="Shop Runs", command=lambda: shop_runs.master.show_frame(shop_runs)).place(relx=0.25, rely=0.25, relwidth=0.123, relheight=0.9)
+        ctk.CTkButton(self, text="Penguins", command=lambda: penguin_tracker.master.show_frame(penguin_tracker)).place(relx=0.375, rely=0.25, relwidth=0.123, relheight=0.9)
 
         # Buttons for ChecklistViewport
-        ttk.Button(self, text="Daily", command=lambda: daily.master.show_frame(daily)).place(relx=0.625, rely=0.25, relwidth=0.123, relheight=0.9)
-        ttk.Button(self, text="Weekly", command=lambda: weekly.master.show_frame(weekly)).place(relx=0.75, rely=0.25, relwidth=0.123, relheight=0.9)
-        ttk.Button(self, text="Monthly", command=lambda: monthly.master.show_frame(monthly)).place(relx=0.875, rely=0.25, relwidth=0.123, relheight=0.9)
+        ctk.CTkButton(self, text="Daily", command=lambda: daily.master.show_frame(daily)).place(relx=0.625, rely=0.25, relwidth=0.123, relheight=0.9)
+        ctk.CTkButton(self, text="Weekly", command=lambda: weekly.master.show_frame(weekly)).place(relx=0.75, rely=0.25, relwidth=0.123, relheight=0.9)
+        ctk.CTkButton(self, text="Monthly", command=lambda: monthly.master.show_frame(monthly)).place(relx=0.875, rely=0.25, relwidth=0.123, relheight=0.9)
 
         self.place(x=0, y=0, relwidth=1, relheight=0.1)
 
@@ -501,5 +493,5 @@ def load_image(path, multiplier):
     """Load and resize an image."""
     image = Image.open(path)
 
-    image = image.resize(tuple(multiplier * x for x in image.size))
-    return ImageTk.PhotoImage(image)
+    image = image.resize(tuple(int(multiplier * x) for x in image.size)) # Convert to int before creating tuple
+    return ctk.CTkImage(image, size=image.size)
