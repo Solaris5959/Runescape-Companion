@@ -1,8 +1,11 @@
 # RS3 Companion App
 ### Introduction
 Designed to make Dailies in RS3 far easier to manage.
-### To Be Implemented
+### Implemented Features
 - [x] GUI
 - [x] Nemi Forest
 - [x] Travelling Merchant's Shop
-- [ ] Shop Runs
+- [x] Shop Runs
+- [x] Daily Actions
+- [x] Weekly Actions
+- [x] Monthly Actions
